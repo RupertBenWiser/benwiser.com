@@ -4,7 +4,8 @@ module.exports = {
     entry: `${__dirname}/src/index.ts`,
     output: {
         filename: 'bundle.js',
-        path: `${__dirname}/dist`
+        path: `${__dirname}/dist`,
+        publicPath: 'dist'
     },
     resolve: {
         extensions: ['.ts', '.js']
