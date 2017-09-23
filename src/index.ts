@@ -3,6 +3,8 @@ import { mat4 } from "gl-matrix";
 import ShaderProgram from "./ShaderProgram";
 import Model from "./Model";
 
+import { ObjLoaderFromUrl } from './Loaders/OBJLoader';
+
 const WIDTH:number = 800;
 const HEIGHT:number = 600;
 
@@ -13,7 +15,7 @@ document.querySelector("body").appendChild(canvas);
 
 const gl = canvas.getContext("webgl");
 
-gl.clearColor(1, 0, 0, 1);
+gl.clearColor(1, 1, 1, 1);
 
 gl.enable(gl.DEPTH_TEST);
 
@@ -27,38 +29,21 @@ mat4.perspective(PROJECTION_MATRIX, 45, WIDTH / HEIGHT, 0.1, 1000);
 
 const defaultShaderProgram = new ShaderProgram(gl);
 
-const v = [
-    -1, 1, 0,
-    -1, 0, 0,
-     0, 0, 0,
-    -1, 1, 0,
-     0, 0, 0,
-     0, 1, 0,
-];
+(async () => {
+    const treeModel = await ObjLoaderFromUrl(gl, "models/tree.obj", "textures/tree.png");
 
-const t = [
-    0, 0,
-    0, 1,
-    1, 1,
-    0, 0,
-    1, 1,
-    1, 0,
-];
+    treeModel.translate([0, -40, -200]);
 
-const mainModel = new Model(gl, v, t, "textures/test.png");
+    const renderLoop = () => {
+        gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+        
+        defaultShaderProgram.useProgram();
+        defaultShaderProgram.setMatrix("PROJECTION_MATRIX", PROJECTION_MATRIX);
+        defaultShaderProgram.setMatrix("VIEW_MATRIX", VIEW_MATRIX);
 
-mainModel.translate([0, 0, -10]);
+        treeModel.render(defaultShaderProgram);
 
-const renderLoop = () => {
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    
-    defaultShaderProgram.useProgram();
-    defaultShaderProgram.setMatrix("PROJECTION_MATRIX", PROJECTION_MATRIX);
-    defaultShaderProgram.setMatrix("VIEW_MATRIX", VIEW_MATRIX);
-
-    mainModel.render(defaultShaderProgram);
-
-    requestAnimationFrame(renderLoop);
-};
-
-renderLoop();
+        requestAnimationFrame(renderLoop);
+    };
+    renderLoop();
+})();

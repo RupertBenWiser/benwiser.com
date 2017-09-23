@@ -4,18 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && rollup -c"
+    "build": "webpack --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.16.2",
+    "gl-matrix": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/gl-matrix": "^2.3.0",
     "awesome-typescript-loader": "^3.2.3",
-    "gl-matrix": "^2.4.0",
-    "rollup": "^0.50.0",
-    "rollup-plugin-commonjs": "^8.2.1",
-    "rollup-plugin-node-resolve": "^3.0.0",
     "typescript": "^2.5.2",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.8.2"

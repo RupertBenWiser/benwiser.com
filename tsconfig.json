@@ -4,8 +4,13 @@
         "module": "es2015",
         "moduleResolution": "node",
         "allowJs": true,
-        "rootDir": "src",
-        "outDir": "compiled"
+        "lib": [
+            "es2015.promise",
+            "dom",
+            "esnext.asynciterable",
+            "es2015.symbol",
+            "es5"
+        ]
     },
     "include": [
         "src"
