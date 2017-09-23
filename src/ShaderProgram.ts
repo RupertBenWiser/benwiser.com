@@ -37,6 +37,10 @@ class ShaderProgram {
         return this.gl.getUniformLocation(this.shaderProgramID, name);
     }
 
+    public getAttribLocation(name: string): number {
+        return this.gl.getAttribLocation(this.shaderProgramID, name);
+    }
+
     public setMatrix(name: string, matrix: mat4) {
         const location = this.getLocation(name);
         this.gl.uniformMatrix4fv(location, false, matrix);

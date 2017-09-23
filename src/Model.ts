@@ -6,9 +6,13 @@ class Model {
     private gl: WebGLRenderingContext;
     private v: number[];
     private vertexBuffer: WebGLBuffer;
+    private textureBuffer: WebGLBuffer;
     private MODEL_MATRIX: mat4;
+    private textureId: WebGLTexture;
+    private textureLoaded: boolean;
 
-    constructor(gl: WebGLRenderingContext, v: number[]) {
+    constructor(gl: WebGLRenderingContext, v: number[], t: number[], texture: string) {
+        this.textureLoaded = false;
         this.gl = gl;
 
         this.v = v;
@@ -19,6 +23,21 @@ class Model {
 
         this.MODEL_MATRIX = new Float32Array(16) as mat4;
         mat4.identity(this.MODEL_MATRIX);
+
+        this.textureId = gl.createTexture();
+        this.textureBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(t), gl.STATIC_DRAW);
+
+        const textureImage = new Image();
+        textureImage.onload = () => {
+            gl.bindTexture(gl.TEXTURE_2D, this.textureId);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
+            gl.generateMipmap(gl.TEXTURE_2D);
+            this.textureLoaded = true;
+        };
+
+        textureImage.src = texture;
     }
 
     public translate(translation: [number, number, number]) {
@@ -26,14 +45,27 @@ class Model {
     }
 
     public render(shader: ShaderProgram): void {
-        const POINTS: number = 2;
+        if (!this.textureLoaded) return;
+
+        const POINTS: number = 3;
 
         const shaderLocation = shader.setMatrix("MODEL_MATRIX", this.MODEL_MATRIX);
 
-        this.gl.enableVertexAttribArray(0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureId);
+        
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-        this.gl.vertexAttribPointer(0, POINTS, this.gl.FLOAT, false, POINTS * Float32Array.BYTES_PER_ELEMENT, 0);
+        const coordsPos = shader.getAttribLocation("coords");
+        this.gl.vertexAttribPointer(coordsPos, POINTS, this.gl.FLOAT, false, POINTS * Float32Array.BYTES_PER_ELEMENT, 0);
+        
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureBuffer);
+        const texCoordsPos = shader.getAttribLocation("texCoords");
+        this.gl.vertexAttribPointer(texCoordsPos, 2, this.gl.FLOAT, false, 2 * Float32Array.BYTES_PER_ELEMENT, 0);
+        
+
+        this.gl.enableVertexAttribArray(0);
+        this.gl.enableVertexAttribArray(1);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, this.v.length / POINTS);
+        this.gl.disableVertexAttribArray(1);
         this.gl.disableVertexAttribArray(0);
     }
 }

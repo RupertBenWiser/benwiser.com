@@ -28,14 +28,26 @@ mat4.perspective(PROJECTION_MATRIX, 45, WIDTH / HEIGHT, 0.1, 1000);
 const defaultShaderProgram = new ShaderProgram(gl);
 
 const v = [
-    -1, 1,
-    -1, 0,
-     0, 0,
+    -1, 1, 0,
+    -1, 0, 0,
+     0, 0, 0,
+    -1, 1, 0,
+     0, 0, 0,
+     0, 1, 0,
 ];
 
-const mainModel = new Model(gl, v);
+const t = [
+    0, 0,
+    0, 1,
+    1, 1,
+    0, 0,
+    1, 1,
+    1, 0,
+];
 
-mainModel.translate([0, 0, -20]);
+const mainModel = new Model(gl, v, t, "textures/test.png");
+
+mainModel.translate([0, 0, -10]);
 
 const renderLoop = () => {
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
