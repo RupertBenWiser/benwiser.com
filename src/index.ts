@@ -30,9 +30,11 @@ mat4.perspective(PROJECTION_MATRIX, 45, WIDTH / HEIGHT, 0.1, 1000);
 const defaultShaderProgram = new ShaderProgram(gl);
 
 (async () => {
-    const treeModel = await ObjLoaderFromUrl(gl, "models/tree.obj", "textures/tree.png");
+    const headModel = await ObjLoaderFromUrl(gl, "models/head.obj", "textures/head.png");
 
-    treeModel.translate([0, -40, -200]);
+    headModel.translate([0, 0, -100]);
+    headModel.scale([30, 30, 30]);
+    headModel.rotate(170, [0, 1, 0]);
 
     const renderLoop = () => {
         gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -41,7 +43,7 @@ const defaultShaderProgram = new ShaderProgram(gl);
         defaultShaderProgram.setMatrix("PROJECTION_MATRIX", PROJECTION_MATRIX);
         defaultShaderProgram.setMatrix("VIEW_MATRIX", VIEW_MATRIX);
 
-        treeModel.render(defaultShaderProgram);
+        headModel.render(defaultShaderProgram);
 
         requestAnimationFrame(renderLoop);
     };

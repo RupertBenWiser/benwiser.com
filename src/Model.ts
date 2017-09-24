@@ -1,4 +1,4 @@
-import { mat4 } from "gl-matrix";
+import { mat4, glMatrix } from "gl-matrix";
 
 import ShaderProgram from "./ShaderProgram";
 
@@ -42,6 +42,14 @@ class Model {
 
     public translate(translation: [number, number, number]) {
         mat4.translate(this.MODEL_MATRIX, this.MODEL_MATRIX, translation);
+    }
+
+    public scale(scale: [number, number, number]) {
+        mat4.scale(this.MODEL_MATRIX, this.MODEL_MATRIX, scale);
+    }
+
+    public rotate(angle: number, axis: [number, number, number]) {
+        mat4.rotate(this.MODEL_MATRIX, this.MODEL_MATRIX, glMatrix.toRadian(angle), axis);
     }
 
     public render(shader: ShaderProgram): void {
