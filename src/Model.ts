@@ -3,11 +3,16 @@ import { mat4, glMatrix } from "gl-matrix";
 import ShaderProgram from "./ShaderProgram";
 
 class Model {
+    private MODEL_MATRIX: mat4;
+    private scaleFactor: [number, number, number];
+    private rotationXFactor: number;
+    private rotationYFactor: number;
+    private translationFactor: [number, number, number];
+
     private gl: WebGLRenderingContext;
     private v: number[];
     private vertexBuffer: WebGLBuffer;
     private textureBuffer: WebGLBuffer;
-    private MODEL_MATRIX: mat4;
     private textureId: WebGLTexture;
     private textureLoaded: boolean;
 
@@ -41,15 +46,19 @@ class Model {
     }
 
     public translate(translation: [number, number, number]) {
-        mat4.translate(this.MODEL_MATRIX, this.MODEL_MATRIX, translation);
+        this.translationFactor = translation;
     }
 
     public scale(scale: [number, number, number]) {
-        mat4.scale(this.MODEL_MATRIX, this.MODEL_MATRIX, scale);
+        this.scaleFactor = scale;
     }
 
-    public rotate(angle: number, axis: [number, number, number]) {
-        mat4.rotate(this.MODEL_MATRIX, this.MODEL_MATRIX, glMatrix.toRadian(angle), axis);
+    public rotateX(angle: number) {
+        this.rotationXFactor = angle;
+    }
+
+    public rotateY(angle: number) {
+        this.rotationYFactor = angle;
     }
 
     public render(shader: ShaderProgram): void {
@@ -57,7 +66,15 @@ class Model {
 
         const POINTS: number = 3;
 
-        const shaderLocation = shader.setMatrix("MODEL_MATRIX", this.MODEL_MATRIX);
+        mat4.identity(this.MODEL_MATRIX);
+        mat4.translate(this.MODEL_MATRIX, this.MODEL_MATRIX, this.translationFactor);
+
+        mat4.rotate(this.MODEL_MATRIX, this.MODEL_MATRIX, glMatrix.toRadian(this.rotationXFactor), [1, 0, 0]);
+        mat4.rotate(this.MODEL_MATRIX, this.MODEL_MATRIX, glMatrix.toRadian(this.rotationYFactor), [0, 1, 0]);
+
+        mat4.scale(this.MODEL_MATRIX, this.MODEL_MATRIX, this.scaleFactor);
+
+        shader.setMatrix("MODEL_MATRIX", this.MODEL_MATRIX);
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureId);
         

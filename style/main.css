@@ -1,0 +1,21 @@
+.head-section {
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
+}
+
+.main-section {
+    position: relative;
+}
+
+.content-section {
+    width: 100%;
+}
+
+.pull-left {
+    float: left;
+}
+
+.pull-right {
+    float: right;
+}
