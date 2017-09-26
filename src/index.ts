@@ -46,8 +46,8 @@ let deviceX, deviceY;
 
 window.addEventListener("deviceorientation", (event) => {
     deviceY = event.gamma / 45;
-    deviceX = 270 + event.beta / 45;
-    if (deviceX !== null) {
+    deviceX = 270.8 + event.beta / 45;
+    if (event.beta !== null) {
         useMouse = false;
     }
 }, false);
