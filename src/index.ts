@@ -5,8 +5,8 @@ import Model from "./Model";
 
 import { ObjLoaderFromUrl } from './Loaders/OBJLoader';
 
-const WIDTH:number = 800;
-const HEIGHT:number = 600;
+const WIDTH:number = window.innerWidth / 4;
+const HEIGHT:number = window.innerWidth / 4;
 
 const canvas = document.createElement("canvas") as HTMLCanvasElement;
 canvas.width = WIDTH;
@@ -56,7 +56,7 @@ window.addEventListener("deviceorientation", (event) => {
     const headModel = await ObjLoaderFromUrl(gl, "models/head.obj", "textures/head.png");
 
 
-    headModel.translate([0, 0, -100]);
+    headModel.translate([0, 0, -65]);
     headModel.scale([30, 30, 30]);
 
     const renderLoop = () => {

@@ -1,21 +1,29 @@
-.head-section {
-    margin-left: auto;
-    margin-right: auto;
-    width: 800px;
-}
-
 .main-section {
     position: relative;
 }
 
+
+.head-section {
+    text-align: center;
+}
 .content-section {
     width: 100%;
 }
 
-.pull-left {
-    float: left;
+.pull-right {
+    text-align: right;
 }
 
-.pull-right {
-    float: right;
+body {
+    font-family: 'Open Sans Condensed', sans-serif;
+}
+
+h1 {
+    font-family: 'Libre Barcode 39 Text', cursive;
+    font-size: 60px;
+}
+
+p {
+    margin-bottom: 0.2em;
+    font-size: 22px;
 }
