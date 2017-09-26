@@ -13,6 +13,10 @@ module.exports = {
     module: {
         loaders: [
             {
+                test: /\.js$/,
+                loader: 'babel-loader'
+            },
+            {
                 test: /\.ts$/,
                 loader: 'awesome-typescript-loader'
             }

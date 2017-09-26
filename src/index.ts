@@ -41,6 +41,17 @@ const currentScreenDimensions = (): [number, number] => {
 
 currentScreenDimensions();
 
+let useMouse = true;
+let deviceX, deviceY;
+
+window.addEventListener("deviceorientation", (event) => {
+    deviceY = event.gamma / 45;
+    deviceX = 270 + event.beta / 45;
+    if (deviceX !== null) {
+        useMouse = false;
+    }
+}, false);
+
 (async () => {
     const headModel = await ObjLoaderFromUrl(gl, "models/head.obj", "textures/head.png");
 
@@ -51,11 +62,17 @@ currentScreenDimensions();
     const renderLoop = () => {
         gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
         
-        const offsetFromCenterX = (mouseCoords[0] - (currentScreenDimensions()[0] / 2)) / (currentScreenDimensions()[0] / 2);
-        const offsetFromCenterY = (mouseCoords[1] - (HEIGHT / 2)) / (HEIGHT / 2);
 
-        headModel.rotateY(180 + offsetFromCenterX * 45);
-        headModel.rotateX(0 + offsetFromCenterY * 45);
+        if (useMouse) {
+            const offsetFromCenterX = (mouseCoords[0] - (currentScreenDimensions()[0] / 2)) / (currentScreenDimensions()[0] / 2);
+            const offsetFromCenterY = (mouseCoords[1] - (HEIGHT / 2)) / (HEIGHT / 2);
+
+            headModel.rotateY(180 + offsetFromCenterX * 45);
+            headModel.rotateX(0 + offsetFromCenterY * 45);
+        } else {
+            headModel.rotateY(180 + deviceY * 45);
+            headModel.rotateX(0 + deviceX * -45);
+        }
 
         defaultShaderProgram.useProgram();
         defaultShaderProgram.setMatrix("PROJECTION_MATRIX", PROJECTION_MATRIX);
