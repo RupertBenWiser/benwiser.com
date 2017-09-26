@@ -1,13 +1,15 @@
 .main-section {
     position: relative;
+    min-height: 100vh;
 }
-
 
 .head-section {
     text-align: center;
 }
 .content-section {
-    width: 100%;
+    position: absolute;
+    bottom: 0;
+    min-width: 100vw;
 }
 
 .pull-right {
@@ -26,4 +28,14 @@ h1 {
 p {
     margin-bottom: 0.2em;
     font-size: 22px;
+}
+
+@media (max-width: 760px) {
+    .pull-right, h1 {
+        text-align: center;
+    }
+
+    .head-section {
+        margin-top: 20vh;
+    }
 }

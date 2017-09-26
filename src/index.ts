@@ -5,8 +5,16 @@ import Model from "./Model";
 
 import { ObjLoaderFromUrl } from './Loaders/OBJLoader';
 
-const WIDTH:number = window.innerWidth / 4;
-const HEIGHT:number = window.innerWidth / 4;
+let WIDTH:number = 0; 
+let HEIGHT:number = 0;
+
+if (window.innerWidth > window.innerHeight) {
+    WIDTH = (window.innerWidth / 2);
+    HEIGHT = ((window.innerWidth / 2) * 3) / 4;
+} else {
+    WIDTH = window.innerWidth;
+    HEIGHT = (window.innerWidth * 3) / 4;
+}
 
 const canvas = document.createElement("canvas") as HTMLCanvasElement;
 canvas.width = WIDTH;
@@ -41,13 +49,27 @@ const currentScreenDimensions = (): [number, number] => {
 
 currentScreenDimensions();
 
+interface coords {
+    x: number;
+    y: number;
+}
+
 let useMouse = true;
-let deviceX, deviceY;
+let deviceCoords: coords;
+let initialDeviceCoords: coords = {
+    x: 0,
+    y: 0,
+};
 
 window.addEventListener("deviceorientation", (event) => {
-    deviceY = event.gamma / 45;
-    deviceX = 270.8 + event.beta / 45;
+    deviceCoords = {
+        x: 270 + event.beta / 45,
+        y: event.gamma / 45,
+    };
     if (event.beta !== null) {
+        if (useMouse) {
+            initialDeviceCoords = deviceCoords;
+        }
         useMouse = false;
     }
 }, false);
@@ -67,11 +89,11 @@ window.addEventListener("deviceorientation", (event) => {
             const offsetFromCenterX = (mouseCoords[0] - (currentScreenDimensions()[0] / 2)) / (currentScreenDimensions()[0] / 2);
             const offsetFromCenterY = (mouseCoords[1] - (HEIGHT / 2)) / (HEIGHT / 2);
 
-            headModel.rotateY(180 + offsetFromCenterX * 45);
             headModel.rotateX(0 + offsetFromCenterY * 45);
+            headModel.rotateY(180 + offsetFromCenterX * 45);
         } else {
-            headModel.rotateY(180 + deviceY * 45);
-            headModel.rotateX(0 + deviceX * -45);
+            headModel.rotateX(0 + (deviceCoords.x - initialDeviceCoords.x) * - 25);
+            headModel.rotateY(180 + (deviceCoords.y - initialDeviceCoords.y) * 25);
         }
 
         defaultShaderProgram.useProgram();
