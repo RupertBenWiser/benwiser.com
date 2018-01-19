@@ -60,8 +60,8 @@ interface coords {
     y: number;
 }
 
-let useMouse = false;
-let useFace = true;
+let useMouse = true;
+let useFace = false;
 let deviceCoords: coords;
 let initialDeviceCoords: coords = {
     x: 0,
@@ -100,14 +100,15 @@ const MAX_SPEED: number = 0.5;
     Tracking.ViolaJones.classifiers.face = face;
     const tracker = new Tracking.ObjectTracker("face");
     
-    tracker.setInitialScale(4);
+    tracker.setInitialScale(2);
     tracker.setStepSize(2);
-    tracker.setEdgesDensity(0.1);
+    tracker.setEdgesDensity(0.05);
     
     Tracking.track('#trackerVideo', tracker, { camera: true });
     
     tracker.on('track', function(event) {
         if (event.data.length) {
+            useFace = true;
             headPosition.x = event.data[0].x;
             headPosition.y = event.data[0].y;
             headPosition.width = event.data[0].width;
@@ -125,31 +126,28 @@ const MAX_SPEED: number = 0.5;
         gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
         
 
-        if (useMouse) {
+        if (useFace) {
+            const rotateField = (field) => {
+                if (Math.abs(headPosition[field] - headRotation[field]) > MAX_SPEED * 2) {
+                    if (headRotation[field] < headPosition[field]) {
+                        headRotation[field] += Math.max((headPosition[field] - headRotation[field]) / 2, MAX_SPEED);
+                    } else if (headRotation[field] > headPosition[field]) {
+                        headRotation[field] -= Math.max((headRotation[field] - headPosition[field]) / 2, MAX_SPEED);
+                    }
+                }
+            };
+
+            rotateField('x');
+            rotateField('y');
+
+            headModel.rotateX(-(120 - headRotation.y) / 5);
+            headModel.rotateY(180 + ((120 - headRotation.x) / 10));
+        } else if (useMouse) {
             const offsetFromCenterX = (mouseCoords[0] - (currentScreenDimensions()[0] / 2)) / (currentScreenDimensions()[0] / 2);
             const offsetFromCenterY = (mouseCoords[1] - (HEIGHT / 2)) / (HEIGHT / 2);
 
             headModel.rotateX(0 + offsetFromCenterY * 45);
             headModel.rotateY(180 + offsetFromCenterX * 45);
-        } else if (useFace) {
-            if (Math.abs(headPosition.y - headRotation.x) > MAX_SPEED * 2) {
-                if (headRotation.y < headPosition.y) {
-                    headRotation.y += Math.max((headPosition.y - headRotation.y) / 2, MAX_SPEED);
-                } else if (headRotation.y > headPosition.y) {
-                    headRotation.y -= Math.max((headRotation.y - headPosition.y) / 2, MAX_SPEED);
-                }
-            }
-
-            if (Math.abs(headPosition.y - headRotation.x) > MAX_SPEED * 2) {
-                if (headRotation.x < headPosition.x) {
-                    headRotation.x += Math.max((headPosition.x - headRotation.x) / 2, MAX_SPEED);
-                } else if (headRotation.y > headPosition.y) {
-                    headRotation.x -= Math.max((headRotation.x - headPosition.x) / 2, MAX_SPEED);
-                }
-            }
-
-            headModel.rotateX(-(120 - headRotation.y) / 5);
-            headModel.rotateY(180 + ((120 - headRotation.x) / 5));
         } else {
             headModel.rotateX(0 + (deviceCoords.x - initialDeviceCoords.x) * - 25);
             headModel.rotateY(180 + (deviceCoords.y - initialDeviceCoords.y) * 25);
