@@ -1,7 +1,13 @@
+declare var window: any;
+
 import { mat4 } from "gl-matrix";
+
 
 import ShaderProgram from "./ShaderProgram";
 import Model from "./Model";
+
+import face from './Data/face';
+import "tracking";
 
 import { ObjLoaderFromUrl } from './Loaders/OBJLoader';
 
@@ -54,7 +60,8 @@ interface coords {
     y: number;
 }
 
-let useMouse = true;
+let useMouse = false;
+let useFace = true;
 let deviceCoords: coords;
 let initialDeviceCoords: coords = {
     x: 0,
@@ -74,7 +81,33 @@ window.addEventListener("deviceorientation", (event) => {
     }
 }, false);
 
+const headPosition = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+};
+
 (async () => {
+    const Tracking = window.tracking;
+    Tracking.ViolaJones.classifiers.face = face;
+    const tracker = new Tracking.ObjectTracker("face");
+    
+    tracker.setInitialScale(4);
+    tracker.setStepSize(2);
+    tracker.setEdgesDensity(0.1);
+    
+    Tracking.track('#trackerVideo', tracker, { camera: true });
+    
+    tracker.on('track', function(event) {
+        if (event.data.length) {
+            headPosition.x = event.data[0].x;
+            headPosition.y = event.data[0].y;
+            headPosition.width = event.data[0].width;
+            headPosition.height = event.data[0].height;
+        }
+    });
+
     const headModel = await ObjLoaderFromUrl(gl, "models/head.obj", "textures/head.png");
 
 
@@ -91,6 +124,10 @@ window.addEventListener("deviceorientation", (event) => {
 
             headModel.rotateX(0 + offsetFromCenterY * 45);
             headModel.rotateY(180 + offsetFromCenterX * 45);
+        } else if (useFace) {
+            console.log(headPosition.x);
+            headModel.rotateX(-(120 - headPosition.y) / 5);
+            headModel.rotateY(180 + ((120 - headPosition.x) / 5));
         } else {
             headModel.rotateX(0 + (deviceCoords.x - initialDeviceCoords.x) * - 25);
             headModel.rotateY(180 + (deviceCoords.y - initialDeviceCoords.y) * 25);
