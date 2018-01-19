@@ -88,6 +88,13 @@ const headPosition = {
     height: 0,
 };
 
+const headRotation = {
+    x: 180,
+    y: 0,
+};
+
+const MAX_SPEED: number = 0.5;
+
 (async () => {
     const Tracking = window.tracking;
     Tracking.ViolaJones.classifiers.face = face;
@@ -125,9 +132,24 @@ const headPosition = {
             headModel.rotateX(0 + offsetFromCenterY * 45);
             headModel.rotateY(180 + offsetFromCenterX * 45);
         } else if (useFace) {
-            console.log(headPosition.x);
-            headModel.rotateX(-(120 - headPosition.y) / 5);
-            headModel.rotateY(180 + ((120 - headPosition.x) / 5));
+            if (Math.abs(headPosition.y - headRotation.x) > MAX_SPEED * 2) {
+                if (headRotation.y < headPosition.y) {
+                    headRotation.y += Math.max((headPosition.y - headRotation.y) / 2, MAX_SPEED);
+                } else if (headRotation.y > headPosition.y) {
+                    headRotation.y -= Math.max((headRotation.y - headPosition.y) / 2, MAX_SPEED);
+                }
+            }
+
+            if (Math.abs(headPosition.y - headRotation.x) > MAX_SPEED * 2) {
+                if (headRotation.x < headPosition.x) {
+                    headRotation.x += Math.max((headPosition.x - headRotation.x) / 2, MAX_SPEED);
+                } else if (headRotation.y > headPosition.y) {
+                    headRotation.x -= Math.max((headRotation.x - headPosition.x) / 2, MAX_SPEED);
+                }
+            }
+
+            headModel.rotateX(-(120 - headRotation.y) / 5);
+            headModel.rotateY(180 + ((120 - headRotation.x) / 5));
         } else {
             headModel.rotateX(0 + (deviceCoords.x - initialDeviceCoords.x) * - 25);
             headModel.rotateY(180 + (deviceCoords.y - initialDeviceCoords.y) * 25);
