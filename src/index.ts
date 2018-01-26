@@ -102,7 +102,7 @@ const MAX_SPEED: number = 5.0;
     
     tracker.setInitialScale(2);
     tracker.setStepSize(2);
-    tracker.setEdgesDensity(0.05);
+    tracker.setEdgesDensity(0.01);
     
     Tracking.track('#trackerVideo', tracker, { camera: true });
     
