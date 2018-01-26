@@ -93,7 +93,7 @@ const headRotation = {
     y: 0,
 };
 
-const MAX_SPEED: number = 0.5;
+const MAX_SPEED: number = 5.0;
 
 (async () => {
     const Tracking = window.tracking;
@@ -106,15 +106,17 @@ const MAX_SPEED: number = 0.5;
     
     Tracking.track('#trackerVideo', tracker, { camera: true });
     
-    tracker.on('track', function(event) {
-        if (event.data.length) {
-            useFace = true;
-            headPosition.x = event.data[0].x;
-            headPosition.y = event.data[0].y;
-            headPosition.width = event.data[0].width;
-            headPosition.height = event.data[0].height;
-        }
-    });
+    if (useMouse) {
+        tracker.on('track', function(event) {
+            if (event.data.length) {
+                useFace = true;
+                headPosition.x = event.data[0].x;
+                headPosition.y = event.data[0].y;
+                headPosition.width = event.data[0].width;
+                headPosition.height = event.data[0].height;
+            }
+        });
+    }
 
     const headModel = await ObjLoaderFromUrl(gl, "models/head.obj", "textures/head.png");
 
@@ -128,19 +130,13 @@ const MAX_SPEED: number = 0.5;
 
         if (useFace) {
             const rotateField = (field) => {
-                if (Math.abs(headPosition[field] - headRotation[field]) > MAX_SPEED * 2) {
-                    if (headRotation[field] < headPosition[field]) {
-                        headRotation[field] += Math.max((headPosition[field] - headRotation[field]) / 2, MAX_SPEED);
-                    } else if (headRotation[field] > headPosition[field]) {
-                        headRotation[field] -= Math.max((headRotation[field] - headPosition[field]) / 2, MAX_SPEED);
-                    }
-                }
+                headRotation[field] += (headPosition[field] - headRotation[field]) / MAX_SPEED;
             };
 
             rotateField('x');
             rotateField('y');
 
-            headModel.rotateX(-(120 - headRotation.y) / 5);
+            headModel.rotateX(-(90 - headRotation.y) / 5);
             headModel.rotateY(180 + ((120 - headRotation.x) / 10));
         } else if (useMouse) {
             const offsetFromCenterX = (mouseCoords[0] - (currentScreenDimensions()[0] / 2)) / (currentScreenDimensions()[0] / 2);
@@ -149,8 +145,8 @@ const MAX_SPEED: number = 0.5;
             headModel.rotateX(0 + offsetFromCenterY * 45);
             headModel.rotateY(180 + offsetFromCenterX * 45);
         } else {
-            headModel.rotateX(0 + (deviceCoords.x - initialDeviceCoords.x) * - 25);
-            headModel.rotateY(180 + (deviceCoords.y - initialDeviceCoords.y) * 25);
+            headModel.rotateX(0 + (deviceCoords.x - initialDeviceCoords.x) * - 15);
+            headModel.rotateY(180 - (deviceCoords.y - initialDeviceCoords.y) * 10);
         }
 
         defaultShaderProgram.useProgram();
